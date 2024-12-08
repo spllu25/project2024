@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">MyProject</string>
+    <string name="title1">Шоколадная девочка</string>
+    <string name="title2">Торт1</string>
+    <string name="title3">Торт2</string>
+    <string name="title4">Торт3</string>
+    <string name="title5">Торт4</string>
+    <string name="title6">Торт5</string>
+    <string name="txt1">Ингредиенты</string>
+    <string name="txt2">Ингредиенты</string>
+    <string name="txt3">Ингредиенты</string>
+    <string name="txt4">Ингредиенты</string>
+    <string name="txt5">Ингредиенты</string>
+    <string name="txt6">Ингредиенты</string>
+</resources>

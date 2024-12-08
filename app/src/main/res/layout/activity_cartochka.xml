@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        />
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="334dp"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    android:layout_marginTop="20dp">
+
+    <ImageView
+        android:id="@+id/cardImage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/image1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/buttonCart"
+        android:layout_width="71dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="2dp"
+        android:textSize="28dp"
+        android:text=""
+        android:padding="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/cardImage"
+        app:layout_constraintTop_toBottomOf="@+id/buttonFav" />
+
+    <Button
+        android:id="@+id/buttonFav"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="3dp"
+        android:layout_marginBottom="241dp"
+        android:textSize="28dp"
+        android:text="☆"
+        android:padding="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/buttonCart"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/buttonCart"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+<TextView
+    android:id="@+id/cardTitle"
+    android:layout_width="match_parent"
+    android:layout_height="55dp"
+    android:layout_marginTop="16dp"
+    android:text="Card Title"
+    android:textSize="24sp"
+    android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/cardDescription"
+        android:layout_width="match_parent"
+        android:layout_height="194dp"
+        android:layout_marginTop="8dp"
+        android:text="Card Description"
+        android:textSize="16sp" />
+
+</LinearLayout>
