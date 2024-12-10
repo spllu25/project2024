@@ -27,13 +27,10 @@ class CartFragment : Fragment() {
     private val currentUserId: String?
         get() = FirebaseAuth.getInstance().currentUser?.uid
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view = inflater.inflate(R.layout.fragment_cart, container, false)
-
         purchCardsList = view.findViewById(R.id.addedCards)
+
         adapter = cardAdapter(mutableListOf(), requireContext(), true)
         purchCardsList.layoutManager = LinearLayoutManager(requireContext())
         purchCardsList.adapter = adapter
@@ -51,17 +48,12 @@ class CartFragment : Fragment() {
 
     private fun loadPurchaseCards() {
         viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                currentUserId?.let { userId ->
-                    val cards = withContext(Dispatchers.IO) {
-                        val snapshot = db.collection("users").document(userId).collection("cart").get().await()
-                        snapshot.documents.mapNotNull { it.toObject(Card::class.java) }
-                    }
-                    adapter.updateCards(cards)
+            currentUserId?.let { userId ->
+                val cartCards = withContext(Dispatchers.IO) {
+                    db.collection("users").document(userId).collection("cart").get().await()
+                        .documents.mapNotNull { it.toObject(Card::class.java) }
                 }
-            } catch (e: Exception) {
-                Log.e("CartFragment", "Ошибка загрузки корзины: ${e.message}", e)
-                Toast.makeText(requireContext(), "Ошибка загрузки данных", Toast.LENGTH_SHORT).show()
+                adapter.updateCards(cartCards)
             }
         }
     }
@@ -69,18 +61,15 @@ class CartFragment : Fragment() {
     private fun startOformlActivity() {
         if (adapter.getCards().isEmpty()) {
             Toast.makeText(context, "Ваша корзина пуста!", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        currentUserId?.let { userId ->
-            val intent = Intent(context, OformlActivity::class.java).apply {
-                putExtra("cost", calculateTotalCost())
-            }
+        } else {
+            val intent = Intent(context, OformlActivity::class.java)
+            intent.putExtra("cost", calculateTotalCost())
             startActivity(intent)
         }
     }
 
     private fun calculateTotalCost(): Int {
-        return 1//adapter.cards.sumOf { it.price * it.quantityPurch }
+        return adapter.getCards().sumOf { it.price }
     }
 }
+

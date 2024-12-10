@@ -4,6 +4,7 @@ import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
 import android.net.ParseException
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
@@ -48,7 +49,7 @@ class OformlActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 val user = withContext(Dispatchers.IO) { getUserById(userId) }
                 user?.let {
-                    client.setText(it.surname) // Заполняем поле именем пользователя
+                    client.setText(it.surname)
                 } ?: Toast.makeText(this@OformlActivity, "Пользователь не найден", Toast.LENGTH_SHORT).show()
             }
 
@@ -61,7 +62,13 @@ class OformlActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleOrder(userId: String, clientName: String, address: String, inputDate: String, cost: Int) {
+    private fun handleOrder(
+        userId: String,
+        clientName: String,
+        address: String,
+        inputDate: String,
+        cost: Int
+    ) {
         val currentDate = Calendar.getInstance()
         currentDate.add(Calendar.DAY_OF_YEAR, 1)
         val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -82,16 +89,11 @@ class OformlActivity : AppCompatActivity() {
                 withContext(Dispatchers.IO) {
                     val originalCards = getPurchasedCards(userId)
 
-                    val updatedCards = originalCards.map { originalCard ->
-                        originalCard.copy(
-                            id = generateCardId(userId, originalCard.id)
-                        )
-                    }
-
                     clearCart(userId)
-                    saveOrder(userId, clientName, address, inputDate, cost.toString(), updatedCards)
+                    saveOrder(userId, clientName, address, inputDate, cost.toString(), originalCards)
                 }
 
+                sendBroadcast(Intent("ACTION_CART_UPDATED"))
                 Toast.makeText(this@OformlActivity, "Заказ оформлен!", Toast.LENGTH_SHORT).show()
                 startActivity(Intent(this@OformlActivity, MainActivity::class.java))
                 finish()
@@ -100,6 +102,7 @@ class OformlActivity : AppCompatActivity() {
             }
         }
     }
+
 
     private suspend fun getUserById(userId: String): User? {
         return try {
@@ -130,23 +133,37 @@ class OformlActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun saveOrder(userId: String, clientName: String, address: String, date: String, cost: String, cards: List<Card>) {
+    private suspend fun saveOrder(
+        userId: String,
+        clientName: String,
+        address: String,
+        date: String,
+        cost: String,
+        cards: List<Card>
+    ) {
         try {
             val orderData = hashMapOf(
                 "clientName" to clientName,
                 "address" to address,
                 "date" to date,
-                "cost" to cost,
-                "cards" to cards
+                "cost" to cost
             )
-            db.collection("users").document(userId).collection("orders").add(orderData).await()
+            val orderRef = db.collection("users").document(userId).collection("orders").document()
+            orderRef.set(orderData).await()
+            val cardsCollection = orderRef.collection("cards")
+            for (card in cards) {
+                cardsCollection.add(card).await()
+            }
         } catch (e: Exception) {
+            Log.e("saveOrder", "Error saving order", e)
         }
     }
+
 
     private fun generateCardId(userId: String, cardId: Int): Int {
         return userId.hashCode() + cardId
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {

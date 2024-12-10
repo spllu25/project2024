@@ -42,20 +42,10 @@ class FavFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             currentUserId?.let { userId ->
                 val favCards = withContext(Dispatchers.IO) {
-                    getFavoriteCardsFromFirestore(userId)
+                    db.collection("users").document(userId).collection("favorites").get().await()
+                        .documents.mapNotNull { it.toObject(Card::class.java) }
                 }
                 adapter.updateCards(favCards)
-            }
-        }
-    }
-
-    private suspend fun getFavoriteCardsFromFirestore(userId: String): List<Card> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val snapshot = db.collection("users").document(userId).collection("favorites").get().await()
-                snapshot.documents.mapNotNull { it.toObject(Card::class.java) }
-            } catch (e: Exception) {
-                emptyList()
             }
         }
     }

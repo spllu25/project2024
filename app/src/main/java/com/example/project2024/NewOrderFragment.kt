@@ -1,18 +1,16 @@
 package com.example.project2024
 
+import android.graphics.*
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.Spinner
-import android.widget.Toast
+import android.widget.*
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -23,6 +21,9 @@ class NewOrderFragment : Fragment() {
     private lateinit var fillingSpinner: Spinner
     private lateinit var creamSpinner: Spinner
     private lateinit var colorSpinner: Spinner
+    private lateinit var cakeImageView: ImageView
+    private val currentUserId: String?
+        get() = FirebaseAuth.getInstance().currentUser?.uid
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,9 +35,10 @@ class NewOrderFragment : Fragment() {
         fillingSpinner = view.findViewById(R.id.filling)
         creamSpinner = view.findViewById(R.id.cream)
         colorSpinner = view.findViewById(R.id.color)
+        cakeImageView = view.findViewById(R.id.cakeImageView)
 
-        // Загружаем опции для спиннеров
         loadOptions()
+        setupListeners()
 
         val buttonLogin: Button = view.findViewById(R.id.buttonLogin)
         buttonLogin.setOnClickListener {
@@ -53,18 +55,18 @@ class NewOrderFragment : Fragment() {
 
             saveOrder(selectedBase, selectedFilling, selectedCream, selectedColor)
         }
+
         return view
     }
 
     private fun loadOptions() {
-        // Используем viewLifecycleOwner.lifecycleScope для безопасной работы с корутинами
         viewLifecycleOwner.lifecycleScope.launch {
-            val bases = getOptionsFromFirestore("bases")
-            val fillings = getOptionsFromFirestore("fillings")
-            val creams = getOptionsFromFirestore("creams")
-            val colors = getOptionsFromFirestore("colors")
+            val bases = listOf("Бисквит", "Шоколадный", "Ванильный", "Медовик")
+            val fillings = listOf("Шоколад", "Карамель", "Крем-брюле", "Фруктовый")
+            val creams = listOf("Сливочный", "Шоколадный", "Йогуртовый", "Сгущенка")
+            val colors = listOf("Красный", "Синий", "Голубой", "Розовый", "Белый")
 
-            if (isAdded) {  // Проверяем, что фрагмент еще прикреплен
+            if (isAdded) {
                 setupSpinner(baseSpinner, bases)
                 setupSpinner(fillingSpinner, fillings)
                 setupSpinner(creamSpinner, creams)
@@ -73,43 +75,141 @@ class NewOrderFragment : Fragment() {
         }
     }
 
-    private suspend fun getOptionsFromFirestore(collectionName: String): List<String> {
-        return withContext(Dispatchers.IO) {
-            val options = mutableListOf<String>()
-            val snapshot = db.collection(collectionName).get().await()
-            for (document in snapshot.documents) {
-                options.add(document.getString("name") ?: "")
-            }
-            options
-        }
-    }
-
     private fun setupSpinner(spinner: Spinner, options: List<String>) {
-        if (isAdded) {  // Проверяем, что фрагмент прикреплен
+        if (isAdded) {
             val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, options)
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinner.adapter = adapter
         }
     }
 
-    private fun saveOrder(base: String, filling: String, cream: String, color: String) {
-        val orderData = hashMapOf(
-            "base" to base,
-            "filling" to filling,
-            "cream" to cream,
-            "color" to color
-        )
+    private fun setupListeners() {
+        val listener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                updateCakeImage()
+            }
 
-        db.collection("orders").add(orderData)
-            .addOnSuccessListener {
-                if (isAdded) {  // Проверяем, что фрагмент прикреплен
-                    Toast.makeText(requireContext(), "Заказ сохранен!", Toast.LENGTH_SHORT).show()
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+
+        baseSpinner.onItemSelectedListener = listener
+        fillingSpinner.onItemSelectedListener = listener
+        creamSpinner.onItemSelectedListener = listener
+        colorSpinner.onItemSelectedListener = listener
+    }
+
+    private fun updateCakeImage() {
+        val baseColor = getBaseColor(baseSpinner.selectedItem.toString())
+        val fillingColor = getFillingColor(fillingSpinner.selectedItem.toString())
+        val toppingColor = getColor(colorSpinner.selectedItem.toString())
+
+        // Загрузка PNG-слоев и их раскраска
+        val baseLayer = BitmapFactory.decodeResource(resources, R.drawable.base).colorize(baseColor)
+        val fillingLayer = BitmapFactory.decodeResource(resources, R.drawable.filling).colorize(fillingColor)
+        val toppingLayer = BitmapFactory.decodeResource(resources, R.drawable.color).colorize(toppingColor)
+
+        // Создание конечного изображения
+        val resultBitmap = Bitmap.createBitmap(baseLayer.width, baseLayer.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(resultBitmap)
+        canvas.drawBitmap(baseLayer, 0f, 0f, null)
+        canvas.drawBitmap(fillingLayer, 0f, 0f, null)
+        canvas.drawBitmap(toppingLayer, 0f, 0f, null)
+
+        // Установка изображения в ImageView
+        cakeImageView.setImageBitmap(resultBitmap)
+    }
+
+    private fun Bitmap.colorize(color: Int): Bitmap {
+        // Создаем изменяемую копию Bitmap
+        val mutableBitmap = this.copy(Bitmap.Config.ARGB_8888, true)
+        val canvas = Canvas(mutableBitmap)
+        val paint = Paint().apply { colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN) }
+        canvas.drawBitmap(mutableBitmap, 0f, 0f, paint)
+        return mutableBitmap
+    }
+
+    private fun getBaseColor(base: String): Int {
+        return when (base) {
+            "Бисквит" -> Color.YELLOW
+            "Шоколадный" -> Color.DKGRAY
+            "Ванильный" -> Color.LTGRAY
+            "Медовик" -> Color.rgb(193, 140, 67)
+            else -> Color.TRANSPARENT
+        }
+    }
+
+    private fun getCreamColor(cream: String): Int {
+        return when (cream) {
+            "Сливочный" -> Color.WHITE
+            "Шоколадный" -> Color.DKGRAY
+            "Йогуртовый" -> Color.LTGRAY
+            "Сгущенка" -> Color.rgb(255, 223, 186)
+            else -> Color.TRANSPARENT
+        }
+    }
+
+    private fun getFillingColor(filling: String): Int {
+        return when (filling) {
+            "Шоколад" -> Color.DKGRAY
+            "Карамель" -> Color.rgb(210, 105, 30)
+            "Крем-брюле" -> Color.LTGRAY
+            "Фруктовый" -> Color.GREEN
+            else -> Color.TRANSPARENT
+        }
+    }
+
+    private fun getColor(colorName: String): Int {
+        return when (colorName) {
+            "Красный" -> Color.RED
+            "Синий" -> Color.BLUE
+            "Голубой" -> Color.CYAN
+            "Розовый" -> Color.MAGENTA
+            "Белый" -> Color.WHITE
+            else -> Color.TRANSPARENT
+        }
+    }
+
+    private fun saveOrder(base: String, filling: String, cream: String, color: String) {
+        val composition = """
+            Состав:
+            • Основа: $base
+            • Начинка: $filling
+            • Крем: $cream
+            • Цвет: $color
+        """.trimIndent()
+
+        val newCard = FirebaseAuth.getInstance().currentUser?.uid?.let {
+            Card(
+                id = (1..100000).random(),
+                title = "Новый заказ",
+                txt = composition,
+                img = "default_image",
+                isFav = false,
+                isPurch = true,
+                quantityPurch = 1
+            )
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            currentUserId?.let { userId ->
+                newCard?.let { card ->
+                    withContext(Dispatchers.IO) {
+                        try {
+                            db.collection("users").document(userId).collection("cart")
+                                .document(card.id.toString()).set(card).await()
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(requireContext(), "Заказ сохранен и добавлен в корзину!", Toast.LENGTH_SHORT).show()
+                            }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(requireContext(), "Ошибка сохранения заказа: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
                 }
+            } ?: run {
+                Toast.makeText(requireContext(), "Не удалось получить идентификатор пользователя", Toast.LENGTH_SHORT).show()
             }
-            .addOnFailureListener { e ->
-                if (isAdded) {  // Проверяем, что фрагмент прикреплен
-                    Toast.makeText(requireContext(), "Ошибка сохранения заказа: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
+        }
     }
 }

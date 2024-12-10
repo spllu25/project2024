@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -35,7 +36,7 @@ class ProfileFragment : Fragment() {
 
         ordersList = view.findViewById(R.id.newOrdersList)
         ordersList.layoutManager = LinearLayoutManager(requireContext())
-        ordersList.adapter = cardAdapter(mutableListOf(), requireContext(), false)
+        ordersList.adapter = cardAdapter(mutableListOf(), requireContext(), false, true)
 
         db = FirebaseFirestore.getInstance()
 
@@ -55,13 +56,61 @@ class ProfileFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             currentUserId?.let { userId ->
                 try {
-                    val snapshot = db.collection("users").document(userId).collection("orders").get().await()
-                    val orderedCards = snapshot.documents.mapNotNull { it.toObject(Card::class.java) }
-                    (ordersList.adapter as cardAdapter).updateCards(orderedCards.toMutableList())
+                    val ordersSnapshot = db.collection("users").document(userId).collection("orders").get().await()
+                    val allCardsWithStatus = mutableListOf<Pair<Card, Boolean>>()
+
+                    val today = Calendar.getInstance().time
+                    val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
+                    for (orderDoc in ordersSnapshot.documents) {
+                        val orderDateStr = orderDoc.getString("date")
+                        val isOrderArchived = try {
+                            val orderDate = formatter.parse(orderDateStr ?: "")
+                            orderDate != null && orderDate.before(today)
+                        } catch (e: Exception) {
+                            false
+                        }
+
+                        val cardsSnapshot = orderDoc.reference.collection("cards").get().await()
+                        val cards = cardsSnapshot.documents.mapNotNull { cardDoc ->
+                            cardDoc.toObject(Card::class.java)?.let { card ->
+                                Pair(card, isOrderArchived)
+                            }
+                        }
+
+                        allCardsWithStatus.addAll(cards)
+                    }
+
+                    updateUI(allCardsWithStatus)
                 } catch (e: Exception) {
                     Log.e("ProfileFragment", "Error loading orders", e)
                 }
             }
         }
     }
+
+    private fun updateUI(cardsWithStatus: List<Pair<Card, Boolean>>) {
+        // Обновляем данные адаптера
+        val adapter = ordersList.adapter as cardAdapter
+        val cards = cardsWithStatus.map { it.first } // Только карточки
+        adapter.updateCards(cards)
+
+        // Устанавливаем серый фон для архивных карточек
+        ordersList.post {
+            for ((index, pair) in cardsWithStatus.withIndex()) {
+                val (_, isArchived) = pair
+                val viewHolder = ordersList.findViewHolderForAdapterPosition(index) as? cardAdapter.MyViewHolder
+                if (viewHolder != null) {
+                    val backgroundColor = if (isArchived) {
+                        ContextCompat.getColor(requireContext(), R.color.dark_gray)
+                    } else {
+                        ContextCompat.getColor(requireContext(), R.color.white)
+                    }
+                    viewHolder.container.setBackgroundColor(backgroundColor)
+                }
+            }
+        }
+    }
+
 }
+
