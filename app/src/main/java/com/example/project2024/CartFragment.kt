@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
+import android.widget.Toolbar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -69,7 +70,7 @@ class CartFragment : Fragment() {
     }
 
     private fun calculateTotalCost(): Int {
-        return adapter.getCards().sumOf { it.price }
+        return adapter.getCards().sumOf { it.price* it.quantityPurch }
     }
 }
 

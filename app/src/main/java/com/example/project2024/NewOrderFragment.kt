@@ -30,7 +30,6 @@ class NewOrderFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_new_order, container, false)
-
         baseSpinner = view.findViewById(R.id.base)
         fillingSpinner = view.findViewById(R.id.filling)
         creamSpinner = view.findViewById(R.id.cream)
@@ -61,10 +60,10 @@ class NewOrderFragment : Fragment() {
 
     private fun loadOptions() {
         viewLifecycleOwner.lifecycleScope.launch {
-            val bases = listOf("Бисквит", "Шоколадный", "Ванильный", "Медовик")
-            val fillings = listOf("Шоколад", "Карамель", "Крем-брюле", "Фруктовый")
-            val creams = listOf("Сливочный", "Шоколадный", "Йогуртовый", "Сгущенка")
-            val colors = listOf("Красный", "Синий", "Голубой", "Розовый", "Белый")
+            val bases = listOf("Бисквитная", "Слоенная", "Песочная", "Медовик")
+            val fillings = listOf("Карамель", "Банан", "Вишня", "Клубника-ваниль")
+            val creams = listOf("Йогуртовый", "Сливочный", "Шоколадный", "Сгущенка")
+            val colors = listOf("Голубой", "Красный", "Синий", "Розовый", "Белый")
 
             if (isAdded) {
                 setupSpinner(baseSpinner, bases)
@@ -97,30 +96,29 @@ class NewOrderFragment : Fragment() {
         creamSpinner.onItemSelectedListener = listener
         colorSpinner.onItemSelectedListener = listener
     }
-
     private fun updateCakeImage() {
         val baseColor = getBaseColor(baseSpinner.selectedItem.toString())
         val fillingColor = getFillingColor(fillingSpinner.selectedItem.toString())
         val toppingColor = getColor(colorSpinner.selectedItem.toString())
 
-        // Загрузка PNG-слоев и их раскраска
         val baseLayer = BitmapFactory.decodeResource(resources, R.drawable.base).colorize(baseColor)
         val fillingLayer = BitmapFactory.decodeResource(resources, R.drawable.filling).colorize(fillingColor)
         val toppingLayer = BitmapFactory.decodeResource(resources, R.drawable.color).colorize(toppingColor)
 
-        // Создание конечного изображения
+        val staticOverlayLayer = BitmapFactory.decodeResource(resources, R.drawable.cake)
+
         val resultBitmap = Bitmap.createBitmap(baseLayer.width, baseLayer.height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(resultBitmap)
         canvas.drawBitmap(baseLayer, 0f, 0f, null)
         canvas.drawBitmap(fillingLayer, 0f, 0f, null)
         canvas.drawBitmap(toppingLayer, 0f, 0f, null)
+        canvas.drawBitmap(staticOverlayLayer, 0f, 0f, null)
 
-        // Установка изображения в ImageView
         cakeImageView.setImageBitmap(resultBitmap)
     }
 
+
     private fun Bitmap.colorize(color: Int): Bitmap {
-        // Создаем изменяемую копию Bitmap
         val mutableBitmap = this.copy(Bitmap.Config.ARGB_8888, true)
         val canvas = Canvas(mutableBitmap)
         val paint = Paint().apply { colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN) }
@@ -130,40 +128,30 @@ class NewOrderFragment : Fragment() {
 
     private fun getBaseColor(base: String): Int {
         return when (base) {
-            "Бисквит" -> Color.YELLOW
-            "Шоколадный" -> Color.DKGRAY
-            "Ванильный" -> Color.LTGRAY
+            "Бисквитная" -> Color.rgb(255, 228, 181)
+            "Слоенная" -> Color.rgb(123, 63, 0)
+            "Песочная" -> Color.rgb(255, 239, 213)
             "Медовик" -> Color.rgb(193, 140, 67)
-            else -> Color.TRANSPARENT
-        }
-    }
-
-    private fun getCreamColor(cream: String): Int {
-        return when (cream) {
-            "Сливочный" -> Color.WHITE
-            "Шоколадный" -> Color.DKGRAY
-            "Йогуртовый" -> Color.LTGRAY
-            "Сгущенка" -> Color.rgb(255, 223, 186)
             else -> Color.TRANSPARENT
         }
     }
 
     private fun getFillingColor(filling: String): Int {
         return when (filling) {
-            "Шоколад" -> Color.DKGRAY
             "Карамель" -> Color.rgb(210, 105, 30)
-            "Крем-брюле" -> Color.LTGRAY
-            "Фруктовый" -> Color.GREEN
+            "Банан" -> Color.rgb(255, 225, 53)
+            "Вишня" -> Color.rgb(139, 0, 0)
+            "Клубника-ваниль" -> Color.rgb(255, 182, 193)
             else -> Color.TRANSPARENT
         }
     }
 
     private fun getColor(colorName: String): Int {
         return when (colorName) {
+            "Голубой" -> Color.rgb(135, 206, 250)
             "Красный" -> Color.RED
-            "Синий" -> Color.BLUE
-            "Голубой" -> Color.CYAN
-            "Розовый" -> Color.MAGENTA
+            "Синий" -> Color.rgb(0, 0, 139)
+            "Розовый" -> Color.rgb(255, 192, 203)
             "Белый" -> Color.WHITE
             else -> Color.TRANSPARENT
         }
@@ -183,10 +171,11 @@ class NewOrderFragment : Fragment() {
                 id = (1..100000).random(),
                 title = "Новый заказ",
                 txt = composition,
-                img = "default_image",
+                img = "def",
                 isFav = false,
                 isPurch = true,
-                quantityPurch = 1
+                quantityPurch = 1,
+                price = 1000
             )
         }
 

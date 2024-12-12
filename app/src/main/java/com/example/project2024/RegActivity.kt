@@ -17,7 +17,6 @@ class RegActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reg)
 
-        // Инициализация Firebase
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
@@ -33,7 +32,7 @@ class RegActivity : AppCompatActivity() {
             val surname = userSurname.text.toString().trim()
             val name = userName.text.toString().trim()
             val dadname = userDadname.text.toString().trim()
-            val login = userNumb.text.toString().trim() // Используется как email
+            val login = userNumb.text.toString().trim()
             val pass = userPass.text.toString().trim()
 
             if (surname.isEmpty() || name.isEmpty() || dadname.isEmpty() || login.isEmpty() || pass.isEmpty()) {
@@ -50,12 +49,10 @@ class RegActivity : AppCompatActivity() {
     }
 
     private fun registerUser(surname: String, name: String, dadname: String, email: String, password: String) {
-        // Регистрация пользователя в Firebase Authentication
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val userId = auth.currentUser?.uid ?: return@addOnCompleteListener
-                    // Сохранение дополнительной информации в Firestore
                     saveUserDataToFirestore(userId, surname, name, dadname, email)
                 } else {
                     Toast.makeText(this, "Ошибка регистрации: ${task.exception?.localizedMessage}", Toast.LENGTH_SHORT).show()

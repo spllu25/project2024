@@ -10,7 +10,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Project2024"
+        android:theme="@style/Theme.Material3.NoActionBar"
         tools:targetApi="31">
         <activity
             android:name=".OformlActivity"
@@ -30,9 +30,8 @@
         <activity
             android:name=".AuthActivity"
             android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Project2024">
-            <intent-filter>
+            android:label="@string/app_name">
+        <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />

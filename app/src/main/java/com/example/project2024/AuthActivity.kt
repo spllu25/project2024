@@ -18,7 +18,6 @@ class AuthActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_auth)
 
-        // Инициализация Firebase Auth и Firestore
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
@@ -48,19 +47,16 @@ class AuthActivity : AppCompatActivity() {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    // Если вход выполнен успешно
                     val currentUser = auth.currentUser
                     if (currentUser != null) {
                         val userId = currentUser.uid
                         navigateToMain(userId)
                     }
                 } else {
-                    // Ошибка входа
                     Toast.makeText(this, "Неверный логин или пароль", Toast.LENGTH_SHORT).show()
                 }
             }
             .addOnFailureListener {
-                // Если произошла ошибка
                 Toast.makeText(this, "Ошибка авторизации: ${it.localizedMessage}", Toast.LENGTH_SHORT).show()
             }
     }

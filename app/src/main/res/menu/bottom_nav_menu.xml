@@ -1,23 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/nav_home"
         android:icon="@drawable/iconhome"
-        android:title="Главная" />
+        app:showAsAction="always"
+        android:title="" />
     <item
         android:id="@+id/nav_favorites"
         android:icon="@drawable/iconfav"
-        android:title="Избранное" />
+        app:showAsAction="always"
+        android:title="" />
     <item
         android:id="@+id/nav_new_order"
         android:icon="@drawable/iconneworder"
-        android:title="Новый заказ" />
+        app:showAsAction="always"
+        android:title="" />
     <item
         android:id="@+id/nav_cart"
         android:icon="@drawable/iconcart"
-        android:title="Корзина" />
+        app:showAsAction="always"
+        android:title="" />
     <item
         android:id="@+id/nav_profile"
         android:icon="@drawable/iconprofile"
-        android:title="Профиль" />
+        app:showAsAction="always"
+        android:title="" />
 </menu>

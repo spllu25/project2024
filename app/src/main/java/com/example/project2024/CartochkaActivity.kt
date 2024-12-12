@@ -26,7 +26,7 @@ class CartochkaActivity : AppCompatActivity() {
         val cardTitle = intent.getStringExtra("cardTitle") ?: ""
         val cardImage = intent.getStringExtra("cardImage")
         val cardDescription = intent.getStringExtra("cardDescription") ?: ""
-        val cardPrice = intent.getDoubleExtra("cardPrice", 0.0)
+        val cardPrice = intent.getIntExtra("cardPrice", 0)
 
         cardTitleTextView.text = cardTitle
         compositionText.text = cardDescription

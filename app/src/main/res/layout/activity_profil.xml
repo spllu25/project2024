@@ -22,13 +22,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="50dp"
+        android:textSize="20sp"
         android:text="Настройки" />
 
     <TextView
         android:id="@+id/surnameText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:textSize="20sp"
         android:text="Фамилия" />
 
     <EditText
@@ -45,7 +49,9 @@
         android:id="@+id/nameText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
         android:layout_marginTop="10dp"
+        android:textSize="20sp"
         android:text="Имя" />
 
     <EditText
@@ -62,7 +68,9 @@
         android:id="@+id/dadnameText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
         android:layout_marginTop="10dp"
+        android:textSize="20sp"
         android:text="Отчество" />
 
     <EditText
@@ -79,8 +87,10 @@
         android:id="@+id/loginText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
         android:layout_marginTop="10dp"
-        android:text="Номер телефона" />
+        android:textSize="20sp"
+        android:text="Логин" />
 
     <EditText
         android:id="@+id/login"
@@ -96,7 +106,9 @@
         android:id="@+id/PassText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
         android:layout_marginTop="10dp"
+        android:textSize="20sp"
         android:text="Пароль" />
 
     <EditText
@@ -108,10 +120,17 @@
         android:ems="10"
         android:inputType="text"
         android:textSize="20sp" />
+    <Button
+        android:id="@+id/updatePassword"
+        android:layout_width="170dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="0dp"
+        android:text="Изменить пароль" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <Button
@@ -119,15 +138,15 @@
             android:layout_width="208dp"
             android:layout_height="50dp"
             android:layout_gravity="center"
-            android:layout_marginTop="0dp"
+            android:layout_marginTop="5dp"
             android:text="Сохранить" />
 
         <Button
             android:id="@+id/buttonLogout"
-            android:layout_width="172dp"
+            android:layout_width="202dp"
             android:layout_height="50dp"
             android:layout_gravity="center"
-            android:layout_marginTop="0dp"
+            android:layout_marginTop="5dp"
             android:text="Выйти" />
     </LinearLayout>
 

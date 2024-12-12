@@ -1,9 +1,50 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-<!-- Base application theme. -->
-<style name="Base.Theme.Project2024" parent="Theme.Material3.DayNight.NoActionBar">
-    <!-- Customize your light theme here. -->
-    <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-</style>
-
-<style name="Theme.Project2024" parent="Base.Theme.Project2024" />
+<resources>
+    <style name="Theme.Material3.NoActionBar" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">#5B1D1F</item>
+        <item name="colorOnPrimary">#130B06</item>
+        <item name="colorPrimaryContainer">#A25548</item>
+        <item name="colorOnPrimaryContainer">#AF5565</item>
+        <item name="colorSecondary">#5B1D1F</item>
+        <item name="colorOnSecondary">#130B06</item>
+        <item name="colorSecondaryContainer">#A25548</item>
+        <item name="colorOnSecondaryContainer">#AF5565</item>
+        <item name="colorTertiary">#5B1D1F</item>
+        <item name="colorOnTertiary">#130B06</item>
+        <item name="colorTertiaryContainer">#A25548</item>
+        <item name="colorOnTertiaryContainer">#AF5565</item>
+        <item name="colorError">#5B1D1F</item>
+        <item name="colorOnError">#130B06</item>
+        <item name="colorErrorContainer">#A25548</item>
+        <item name="colorOnErrorContainer">#AF5565</item>
+        <item name="android:colorBackground">#130B06</item>
+        <item name="colorOnBackground">#AF5565</item>
+        <item name="colorSurface">#130B06</item>
+        <item name="colorOnSurface">#AF5565</item>
+        <item name="colorSurfaceVariant">#5B1D1F</item>
+        <item name="colorOnSurfaceVariant">#A25548</item>
+        <item name="colorOutline">#5B1D1F</item>
+        <item name="colorOutlineVariant">#A25548</item>
+        <item name="colorSurfaceInverse">#130B06</item>
+        <item name="colorOnSurfaceInverse">#AF5565</item>
+        <item name="colorPrimaryInverse">#AF5565</item>
+        <item name="colorPrimaryFixed">#5B1D1F</item>
+        <item name="colorOnPrimaryFixed">#130B06</item>
+        <item name="colorPrimaryFixedDim">#A25548</item>
+        <item name="colorOnPrimaryFixedVariant">#AF5565</item>
+        <item name="colorSecondaryFixed">#5B1D1F</item>
+        <item name="colorOnSecondaryFixed">#130B06</item>
+        <item name="colorSecondaryFixedDim">#A25548</item>
+        <item name="colorOnSecondaryFixedVariant">#AF5565</item>
+        <item name="colorTertiaryFixed">#5B1D1F</item>
+        <item name="colorOnTertiaryFixed">#130B06</item>
+        <item name="colorTertiaryFixedDim">#A25548</item>
+        <item name="colorOnTertiaryFixedVariant">#AF5565</item>
+        <item name="colorSurfaceDim">#130B06</item>
+        <item name="colorSurfaceBright">#AF5565</item>
+        <item name="colorSurfaceContainerLowest">#130B06</item>
+        <item name="colorSurfaceContainerLow">#130B06</item>
+        <item name="colorSurfaceContainer">#130B06</item>
+        <item name="colorSurfaceContainerHigh">#5B1D1F</item>
+        <item name="colorSurfaceContainerHighest">#A25548</item>
+    </style>
 </resources>

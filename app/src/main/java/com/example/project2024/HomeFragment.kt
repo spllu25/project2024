@@ -48,7 +48,12 @@ class HomeFragment : Fragment() {
                 loadCards()
             }
         }
-        requireContext().registerReceiver(cartUpdatedReceiver, IntentFilter("ACTION_CART_UPDATED"), Context.RECEIVER_NOT_EXPORTED)
+
+        requireContext().registerReceiver(
+            cartUpdatedReceiver,
+            IntentFilter("ACTION_CART_UPDATED"),
+            Context.RECEIVER_NOT_EXPORTED
+        )
     }
 
     override fun onStop() {
@@ -64,10 +69,9 @@ class HomeFragment : Fragment() {
                         .documents.mapNotNull { it.toObject(Card::class.java) }
                 }
                 if (userCards.isEmpty()) {
-                    val staticCards = listOf(
-                        Card(1, getString(R.string.title1), getString(R.string.txt1), "image1", false, false, 0,700),
-                        Card(2,  getString(R.string.title2), getString(R.string.txt2), "image1", false, false, 0,500)
-                    )
+
+                    val staticCards =load()
+
                     saveStaticCardsToFirestore(staticCards, userId)
                     adapter.updateCards(staticCards)
                 } else {
@@ -85,5 +89,80 @@ class HomeFragment : Fragment() {
             }
         }
     }
+
+    private fun load(): List<Card> {
+        val bases = resources.getStringArray(R.array.bases).toList()
+        val fillings = resources.getStringArray(R.array.fillings).toList()
+        val creams = resources.getStringArray(R.array.creams).toList()
+        val colors = resources.getStringArray(R.array.colors).toList()
+        val staticCards = listOf(
+            Card(
+                1,
+                getString(R.string.title1),
+                """
+            Состав:
+            • Основа: ${bases[0]}
+            • Начинка: ${fillings[0]}
+            • Крем: ${creams[0]}
+            • Цвет: ${colors[0]}
+        """.trimIndent(),
+                "def",
+                false,
+                false,
+                0,
+                700
+            ),
+            Card(
+                2,
+                getString(R.string.title2),
+                """
+            Состав:
+            • Основа: ${bases[1]}
+            • Начинка: ${fillings[1]}
+            • Крем: ${creams[1]}
+            • Цвет: ${colors[1]}
+        """.trimIndent(),
+                "def",
+                false,
+                false,
+                0,
+                1000
+            ),
+            Card(
+                3,
+                getString(R.string.title3),
+                """
+            Состав:
+            • Основа: ${bases[2]}
+            • Начинка: ${fillings[2]}
+            • Крем: ${creams[2]}
+            • Цвет: ${colors[2]}
+        """.trimIndent(),
+                "def",
+                false,
+                false,
+                0,
+                700
+            ),
+            Card(
+                4,
+                getString(R.string.title4),
+                """
+            Состав:
+            • Основа: ${bases[3]}
+            • Начинка: ${fillings[3]}
+            • Крем: ${creams[3]}
+            • Цвет: ${colors[3]}
+        """.trimIndent(),
+                "def",
+                false,
+                false,
+                0,
+                1500
+            )
+        )
+        return staticCards
+    }
 }
+
 

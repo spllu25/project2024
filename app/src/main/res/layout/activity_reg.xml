@@ -13,7 +13,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="170dp"
+        android:layout_marginTop="150dp"
+        android:textSize="20sp"
         android:text="Регистрация" />
 
     <EditText
@@ -77,6 +78,7 @@
         android:layout_height="50dp"
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
+        android:textSize="17sp"
         android:text="Зарегистрироваться" />
 
     <Button
@@ -85,6 +87,7 @@
         android:layout_height="50dp"
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
+        android:textSize="20sp"
         android:text="Войти" />
 
 

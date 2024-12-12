@@ -37,7 +37,6 @@ class OformlActivity : AppCompatActivity() {
         db = FirebaseFirestore.getInstance()
 
         val stoimost = intent.getIntExtra("cost", -1)
-
         val client: EditText = findViewById(R.id.poluchatel)
         val address: EditText = findViewById(R.id.address)
         val date: EditText = findViewById(R.id.date)
@@ -88,12 +87,19 @@ class OformlActivity : AppCompatActivity() {
             try {
                 withContext(Dispatchers.IO) {
                     val originalCards = getPurchasedCards(userId)
-
                     clearCart(userId)
                     saveOrder(userId, clientName, address, inputDate, cost.toString(), originalCards)
+                    originalCards.forEach { card ->
+                        card.isPurch = false
+                        card.quantityPurch = 0
+                        sendBroadcast(Intent("ACTION_CART_UPDATED").apply {
+                            putExtra("cardId", card.id)
+                            putExtra("isPurch", false)
+                            putExtra("quantity", 0)
+                        })
+                    }
                 }
 
-                sendBroadcast(Intent("ACTION_CART_UPDATED"))
                 Toast.makeText(this@OformlActivity, "Заказ оформлен!", Toast.LENGTH_SHORT).show()
                 startActivity(Intent(this@OformlActivity, MainActivity::class.java))
                 finish()
@@ -102,7 +108,6 @@ class OformlActivity : AppCompatActivity() {
             }
         }
     }
-
 
     private suspend fun getUserById(userId: String): User? {
         return try {
@@ -127,9 +132,19 @@ class OformlActivity : AppCompatActivity() {
             val cartCollection = db.collection("users").document(userId).collection("cart")
             val snapshot = cartCollection.get().await()
             for (document in snapshot.documents) {
+                val card = document.toObject(Card::class.java)
+                card?.let {
+                    it.isPurch = false
+                    it.quantityPurch = 0
+                    db.collection("users").document(userId).collection("cards")
+                        .document(it.id.toString()).set(it).await()
+                    db.collection("users").document(userId).collection("favorites")
+                        .document(it.id.toString()).set(it).await()
+                }
                 cartCollection.document(document.id).delete().await()
             }
         } catch (e: Exception) {
+            Log.e("clearCart", "Error clearing cart", e)
         }
     }
 
@@ -157,11 +172,6 @@ class OformlActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("saveOrder", "Error saving order", e)
         }
-    }
-
-
-    private fun generateCardId(userId: String, cardId: Int): Int {
-        return userId.hashCode() + cardId
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

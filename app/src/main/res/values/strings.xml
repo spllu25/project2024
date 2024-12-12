@@ -4,12 +4,38 @@
     <string name="title2">Торт1</string>
     <string name="title3">Торт2</string>
     <string name="title4">Торт3</string>
-    <string name="title5">Торт4</string>
-    <string name="title6">Торт5</string>
     <string name="txt1">Ингредиенты</string>
     <string name="txt2">Ингредиенты</string>
     <string name="txt3">Ингредиенты</string>
     <string name="txt4">Ингредиенты</string>
-    <string name="txt5">Ингредиенты</string>
-    <string name="txt6">Ингредиенты</string>
+
+    <string-array name="bases">
+        <item>Бисквитная</item>
+        <item>Слоенная</item>
+        <item>Песочная</item>
+        <item>Медовик</item>
+    </string-array>
+
+    <string-array name="fillings">
+        <item>Шоколад</item>
+        <item>Карамель</item>
+        <item>Крем-брюле</item>
+        <item>Фруктовый</item>
+    </string-array>
+
+    <string-array name="creams">
+        <item>Йогуртовый</item>
+        <item>Сливочный</item>
+        <item>Шоколадный</item>
+        <item>Сгущенка</item>
+    </string-array>
+
+    <string-array name="colors">
+        <item>Голубой</item>
+        <item>Красный</item>
+        <item>Синий</item>
+        <item>Розовый</item>
+        <item>Белый</item>
+    </string-array>
 </resources>
+

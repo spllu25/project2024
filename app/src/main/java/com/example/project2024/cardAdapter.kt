@@ -2,23 +2,20 @@ package com.example.project2024
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
-import androidx.core.view.isGone
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
+import kotlinx.coroutines.tasks.await
 
 
 class cardAdapter(
@@ -70,12 +67,16 @@ class cardAdapter(
             holder.likedButton.visibility = View.GONE
             holder.toBuyButton.visibility = View.GONE
         } else {
-            holder.likedButton.visibility = View.VISIBLE
+            if (isCartFragment) {
+                holder.likedButton.visibility = View.GONE
+            } else {
+                holder.likedButton.visibility = View.VISIBLE
+            }
             holder.toBuyButton.visibility = View.VISIBLE
 
             holder.likedButton.text = if (card.isFav) "★" else "☆"
             holder.toBuyButton.text = when {
-                card.quantityPurch > 0 -> "+(${card.quantityPurch})"
+                card.quantityPurch > 0 -> "(${card.quantityPurch})"
                 else -> "+"
             }
 
@@ -104,7 +105,7 @@ class cardAdapter(
                 putExtra("isPurch", card.isPurch)
                 putExtra("quantityPurch", card.quantityPurch)
                 putExtra("cardPrice", card.price)
-                }
+            }
             context.startActivity(intent)
         }
     }
@@ -112,9 +113,14 @@ class cardAdapter(
     private fun addToCart(card: Card, holder: MyViewHolder) {
         card.isPurch = true
         card.quantityPurch++
-        holder.toBuyButton.text = "+(${card.quantityPurch})"
+        holder.toBuyButton.text = "(${card.quantityPurch})"
         updateCardInFirestore(card, "cart", true)
-        context.sendBroadcast(Intent("ACTION_CART_UPDATED"))
+
+        context.sendBroadcast(Intent("ACTION_CART_UPDATED").apply {
+            putExtra("cardId", card.id)
+            putExtra("isPurch", true)
+            putExtra("quantity", card.quantityPurch)
+        })
     }
 
     private fun removeFromCart(card: Card, holder: MyViewHolder) {
@@ -124,24 +130,59 @@ class cardAdapter(
             card.isPurch = false
             card.quantityPurch = 0
         }
-        holder.toBuyButton.text = if (card.quantityPurch > 0) "+(${card.quantityPurch})" else "+"
+        holder.toBuyButton.text = if (card.quantityPurch > 0) "(${card.quantityPurch})" else "+"
         updateCardInFirestore(card, "cart", card.isPurch)
-        context.sendBroadcast(Intent("ACTION_CART_UPDATED"))
+
+        context.sendBroadcast(Intent("ACTION_CART_UPDATED").apply {
+            putExtra("cardId", card.id)
+            putExtra("isPurch", card.isPurch)
+            putExtra("quantity", card.quantityPurch)
+        })
     }
 
-    private fun updateCardInFirestore(card: Card, collection: String, shouldExist: Boolean) {
+    private fun updateCardInFirestore(card: Card, triggeringCollection: String, shouldExist: Boolean) {
         currentUserId?.let { userId ->
             CoroutineScope(Dispatchers.IO).launch {
-                val userCardsRef = db.collection("users").document(userId).collection("cards")
-                userCardsRef.document(card.id.toString()).set(card)
+                val userRef = db.collection("users").document(userId)
 
-                val collectionRef = db.collection("users").document(userId).collection(collection)
+                val cardRef = userRef.collection("cards").document(card.id.toString())
+                cardRef.set(card)
+                val collectionsToSync = listOf("favorites", "cart").filter { it != triggeringCollection }
+
+                for (collection in collectionsToSync) {
+                    val collectionRef = userRef.collection(collection)
+                    val cardDoc = collectionRef.document(card.id.toString()).get().await()
+
+                    if (cardDoc.exists()) {
+                        collectionRef.document(card.id.toString()).update(
+                            mapOf(
+                                "isPurch" to card.isPurch,
+                                "quantityPurch" to card.quantityPurch
+                            )
+                        )
+                    }
+                }
+
+                val triggeringCollectionRef = userRef.collection(triggeringCollection)
                 if (shouldExist) {
-                    collectionRef.document(card.id.toString()).set(card)
+                    triggeringCollectionRef.document(card.id.toString()).set(card)
                 } else {
-                    collectionRef.document(card.id.toString()).delete()
+                    triggeringCollectionRef.document(card.id.toString()).delete()
                 }
             }
+        }
+    }
+
+    fun updateCardStatus(cardId: Int, isPurchased: Boolean, quantity: Int = 0) {
+        val cardIndex = cards.indexOfFirst { it.id == cardId }
+        if (cardIndex != -1) {
+            val card = cards[cardIndex]
+            Log.d("cardAdapter", "Updating card: $cardId -> isPurchased=$isPurchased, quantity=$quantity")
+            card.isPurch = isPurchased
+            card.quantityPurch = if (isPurchased) quantity.coerceAtLeast(1) else 0
+            notifyItemChanged(cardIndex)
+        } else {
+            Log.d("cardAdapter", "Card not found: $cardId")
         }
     }
 }

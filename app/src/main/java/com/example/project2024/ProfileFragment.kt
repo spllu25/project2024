@@ -90,27 +90,24 @@ class ProfileFragment : Fragment() {
     }
 
     private fun updateUI(cardsWithStatus: List<Pair<Card, Boolean>>) {
-        // Обновляем данные адаптера
         val adapter = ordersList.adapter as cardAdapter
-        val cards = cardsWithStatus.map { it.first } // Только карточки
+        val cards = cardsWithStatus.map { it.first }
         adapter.updateCards(cards)
 
-        // Устанавливаем серый фон для архивных карточек
         ordersList.post {
             for ((index, pair) in cardsWithStatus.withIndex()) {
                 val (_, isArchived) = pair
                 val viewHolder = ordersList.findViewHolderForAdapterPosition(index) as? cardAdapter.MyViewHolder
                 if (viewHolder != null) {
                     val backgroundColor = if (isArchived) {
-                        ContextCompat.getColor(requireContext(), R.color.dark_gray)
+                        ContextCompat.getColor(requireContext(), R.color.md_theme_outline_mediumContrast)
                     } else {
-                        ContextCompat.getColor(requireContext(), R.color.white)
+                        ContextCompat.getColor(requireContext(), R.color.md_theme_background)
                     }
                     viewHolder.container.setBackgroundColor(backgroundColor)
                 }
             }
         }
     }
-
 }
 

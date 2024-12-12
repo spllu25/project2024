@@ -1,6 +1,5 @@
 package com.example.project2024
 import android.os.Bundle
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -42,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadUserData(userId: Int) {
+        private fun loadUserData(userId: Int) {
         database.child("users").child(userId.toString()).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {

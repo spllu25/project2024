@@ -8,6 +8,6 @@ data class Card(
     var isFav: Boolean = false,
     var isPurch: Boolean = false,
     var quantityPurch: Int = 0,
-    val price: Int = 0
+    val price: Int =0
 )
 

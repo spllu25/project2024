@@ -2,34 +2,30 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/newOrdersTitle"
-        android:layout_width="wrap_content"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Ваши заказы"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp" />
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:title="Мои тортики" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/newOrdersList"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="#EEEEEE" />
+        android:layout_height="match_parent"
+        android:layout_marginTop="30dp"
+        android:layout_weight="1"/>
 
     <Button
         android:id="@+id/buttonProfileSettings"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Настройки профиля"
-        android:background="?attr/colorPrimary"
-        android:textColor="@android:color/white"
-        android:textStyle="bold"
-        android:padding="12dp" />
+        android:layout_width="220dp"
+        android:layout_height="50dp"
+        android:padding="0dp"
+        android:layout_gravity="center"
+        android:text="Настройки профиля"/>
 </LinearLayout>
