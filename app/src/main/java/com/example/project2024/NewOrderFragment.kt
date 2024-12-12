@@ -51,10 +51,8 @@ class NewOrderFragment : Fragment() {
                 "Вы выбрали: $selectedBase, $selectedFilling, $selectedCream, $selectedColor",
                 Toast.LENGTH_SHORT
             ).show()
-
             saveOrder(selectedBase, selectedFilling, selectedCream, selectedColor)
         }
-
         return view
     }
 

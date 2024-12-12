@@ -91,10 +91,8 @@ class FavFragment : Fragment() {
                         .await()
                         .documents.mapNotNull { it.toObject(Card::class.java) }
                 }
-                Log.d("FavFragment", "Loaded favorite cards: $favCards")
                 adapter.updateCards(favCards)
             } ?: run {
-                Log.d("FavFragment", "No user logged in. Clearing adapter.")
                 adapter.updateCards(emptyList())
             }
         }

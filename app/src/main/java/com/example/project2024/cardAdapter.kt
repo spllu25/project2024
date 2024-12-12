@@ -177,7 +177,6 @@ class cardAdapter(
         val cardIndex = cards.indexOfFirst { it.id == cardId }
         if (cardIndex != -1) {
             val card = cards[cardIndex]
-            Log.d("cardAdapter", "Updating card: $cardId -> isPurchased=$isPurchased, quantity=$quantity")
             card.isPurch = isPurchased
             card.quantityPurch = if (isPurchased) quantity.coerceAtLeast(1) else 0
             notifyItemChanged(cardIndex)
